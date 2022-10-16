@@ -3,27 +3,36 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 /**
- * Contract address: 0x18089291a6484850153e6EC7637D2EcC9AAe803c
- * Saransh Patel (18CS30039)
- * Utkarsh Patel (18EC35034)
+ * Contract is deployed at 0x18089291a6484850153e6EC7637D2EcC9AAe803c on 
+ * Ethereum Goerli Test Network
  *
- * We didn't use require as it forbids returning a value in case require condition fails.
+ * Authors:
+ *     Utkarsh Patel (18EC35034)
+ *     Saransh Patel (18CS30039)
+ *
+ * Part of Assignment #3 for course CS61065 (Autumn 2022)
  */
 
 
+/**
+ * Solidity contract for Morra game for two players. See README.pdf for 
+ * instructions on how to play this game.
+ */
 contract MorraGame {
-    address payable[2] private playerAddress;
-    bytes32[2]         private playerHashMove;
-    bool[2]            private hasPlayerCommited;
-    string[2]          private playerRevealMove;
-    bool[2]            private hasPlayerRevealed;
+    address payable[2] private playerAddress;      /* address of two players       */
+    bytes32[2]         private playerHashMove;     /* hashed move of the players   */
+    bool[2]            private hasPlayerCommited;  /* Check if committed           */
+    string[2]          private playerRevealMove;   /* unhashed move of the players */
+    bool[2]            private hasPlayerRevealed;  /* Check if move is revealed    */
 
-    uint               private betThreshold;
-    uint               private totalBet;
-    uint               private playerCount;
+    uint               private betThreshold;       /* threshold on bet to register */
+    uint               private totalBet;           /* total bet on the game        */
+    uint               private playerCount;        /* number of players registered */
 
-    
 
+    /**
+     * Reset state of this contract at the initialization or after a game ends
+     */
     function reset() private {
         betThreshold         = (uint) (1e15 + 1);
         totalBet             = 0;
@@ -39,6 +48,9 @@ contract MorraGame {
     }
 
 
+    /**
+     * Routine to be used by players to register in the game
+     */
     function initialize() public payable returns (uint) {
         if (playerCount >= 2) {
             /* Two players already registed */
@@ -73,6 +85,9 @@ contract MorraGame {
     }
 
 
+    /**
+     * Routine to commit player's move in the contract
+     */
     function commitmove(bytes32 hashMove) public returns (bool) {
         if (playerCount != 2) {
             return false;
@@ -94,6 +109,10 @@ contract MorraGame {
         return true;
     }
 
+
+    /**
+     * Routine to reveal player's move
+     */
     function revealmove(string memory revealedMove) public returns (int) {
         uint playerID = getPlayerId();
         if (playerID == 0) {
@@ -102,7 +121,6 @@ contract MorraGame {
         }
 
         playerID--;
-
         if (!hasPlayerCommited[0] || !hasPlayerCommited[1]) {
             /* Both players have not committed */
             return -1;
@@ -144,6 +162,9 @@ contract MorraGame {
     }
 
 
+    /**
+     * Routine to extract #fingers from player's response
+     */
     function getFirstChar(string memory str) private pure returns (int) {
         if (bytes(str)[0] == 0x30) {
             return 0;
@@ -162,22 +183,8 @@ contract MorraGame {
         }
     }
 
-    function getPlayer1HashMove() public view returns (bytes32) {
-        return playerHashMove[0];
-    }
 
-    function getPlayer2HashMove() public view returns (bytes32) {
-        return playerHashMove[1];
-    }
-
-    function getPlayer1Move() public view returns (string memory) {
-        return playerRevealMove[0];
-    }
-
-    function getPlayer2Move() public view returns (string memory) {
-        return playerRevealMove[1];
-    }
-
+    /******************************* DEBUGGER *********************************/
 
 
     /**
@@ -186,6 +193,7 @@ contract MorraGame {
     function getBalance() public view returns (uint) {
         return totalBet;
     }
+
     
     /**
      * If executing a/c is 
@@ -199,20 +207,43 @@ contract MorraGame {
         return 0;
     }
 
+
     function getPlayerCount() public view returns (uint) {
         return playerCount;
     }
+
 
     function getBetThreshold() public view returns (uint) {
         return betThreshold;
     }
 
+
     function getPlayer1Address() public view returns (address payable) {
         return playerAddress[0];
     }
+    
 
     function getPlayer2Address() public view returns (address payable) {
         return playerAddress[1];
     }
 
+
+    function getPlayer1HashMove() public view returns (bytes32) {
+        return playerHashMove[0];
+    }
+
+
+    function getPlayer2HashMove() public view returns (bytes32) {
+        return playerHashMove[1];
+    }
+
+
+    function getPlayer1Move() public view returns (string memory) {
+        return playerRevealMove[0];
+    }
+
+
+    function getPlayer2Move() public view returns (string memory) {
+        return playerRevealMove[1];
+    }
 }
